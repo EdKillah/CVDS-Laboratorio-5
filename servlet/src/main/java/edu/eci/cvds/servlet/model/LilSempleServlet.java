@@ -5,8 +5,13 @@
  */
 package edu.eci.cvds.servlet.model;
 
+import edu.eci.cvds.servlet.Service;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.MalformedURLException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -25,14 +30,81 @@ import javax.servlet.http.HttpServletResponse;
 
 public class LilSempleServlet extends HttpServlet{
     
-   
    @Override
    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
        Writer responseWriter = resp.getWriter();
-       Optional<String> optName = Optional.ofNullable(req.getParameter("name"));
-       String name = optName.isPresent() && !optName.get().isEmpty() ? optName.get() : "";
-       resp.setStatus(HttpServletResponse.SC_OK);
-       responseWriter.write("Hello" + name + "!");
+       Optional<String> optName = Optional.ofNullable(req.getParameter("id"));
+       //String name = optName.isPresent() && !optName.get().isEmpty() ? optName.get() : "";
+       try{
+        String id = optName.isPresent() && !optName.get().isEmpty() ? optName.get() : "0";
+        if(Service.getTodo(Integer.parseInt(id))!=null){
+           resp.setStatus(HttpServletResponse.SC_OK);
+           List<Todo> todoList= Arrays.asList(Service.getTodo(Integer.parseInt(id)));
+           responseWriter.write(Service.todosToHTMLTable(todoList));
+           System.out.println("FuncionaCorrectamente");
+
+        }
+        else{
+            System.out.println("Entra en else NOTFOUND");
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+       }
+       catch(MalformedURLException e){
+           System.out.println("MalFormadomvn packa");
+           resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+       }
+      catch(NumberFormatException e){
+
+            resp.setStatus(HttpServletResponse.	SC_BAD_REQUEST);
+      }
+      catch(FileNotFoundException e){
+          responseWriter.write("No existe ningun elemento con el id indicado.");
+          resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      }
+      catch(Exception e){
+          resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      }
+      finally{      
        responseWriter.flush();
+      }
+   }
+   
+      @Override
+   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+       Writer responseWriter = resp.getWriter();
+       Optional<String> optName = Optional.ofNullable(req.getParameter("id"));
+       //String name = optName.isPresent() && !optName.get().isEmpty() ? optName.get() : "";
+       try{
+        String id = optName.isPresent() && !optName.get().isEmpty() ? optName.get() : "0";
+        if(Service.getTodo(Integer.parseInt(id))!=null){
+           resp.setStatus(HttpServletResponse.SC_OK);
+           List<Todo> todoList= Arrays.asList(Service.getTodo(Integer.parseInt(id)));
+           responseWriter.write(Service.todosToHTMLTable(todoList));
+           System.out.println("FuncionaCorrectamente");
+
+        }
+        else{
+            System.out.println("Entra en else NOTFOUND");
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+       }
+       catch(MalformedURLException e){
+           System.out.println("MalFormadomvn packa");
+           resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+       }
+      catch(NumberFormatException e){
+
+            resp.setStatus(HttpServletResponse.	SC_BAD_REQUEST);
+      }
+      catch(FileNotFoundException e){
+          responseWriter.write("No existe ningun elemento con el id indicado.");
+          resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      }
+      catch(Exception e){
+          resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      }
+      finally{      
+       responseWriter.flush();
+      }
    }
 }
